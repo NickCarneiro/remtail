@@ -1,0 +1,14 @@
+{
+  "name": "remtail",
+  "version": "0.0.0",
+  "description": "tail out log files from multiple remote hosts",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/test.js"
+  },
+  "keywords": [
+    "tail"
+  ],
+  "author": "Nick Carneiro",
+  "license": "MIT"
+}
