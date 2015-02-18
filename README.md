@@ -1,4 +1,5 @@
 # remtail
+# This does not actually work yet. 
 
 tail out log files from multiple remote hosts
 
