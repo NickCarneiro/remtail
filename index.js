@@ -30,12 +30,21 @@ for (var hostName in hosts) {
         });
     }.bind(this, conn, tailCommand, hostName);
     
-    conn.on('ready', readyCallback).connect({
+    var connectionParams = {
         host: hostName,
         port: host.port,
-        username: host.user,
-        password: host.password
-    });
+        username: host.user
+    };
+    
+    if (host.password) {
+        connectionParams.password = host.password;
+    } else if (host.privateKey) {
+        connectionParams.privateKey = host.privateKey;
+    } else {
+        connectionParams.password = prompt('Password for ' + hostName);
+    }
+    
+    conn.on('ready', readyCallback).connect(connectionParams);
 }
 
 
