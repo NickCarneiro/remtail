@@ -10,5 +10,8 @@
     "tail"
   ],
   "author": "Nick Carneiro",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "ssh2": "^0.4.4"
+  }
 }
