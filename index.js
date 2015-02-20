@@ -4,7 +4,9 @@ var SshClient = require('ssh2').Client;
 var hosts = require('./lib/hosts');
 
 // open an ssh connection to every host and run the tail commands
+var hostsSize = 0;
 for (var hostName in hosts) {
+    hostsSize++;
     var host = hosts[hostName];
     var password = host.password;
     var tailCommand = buildTailCommand(host.paths);
@@ -45,6 +47,11 @@ for (var hostName in hosts) {
     }
     
     conn.on('ready', readyCallback).connect(connectionParams);
+}
+
+if (hostsSize === 0) {
+    console.log('usage: ');
+    console.log('remtail hostname:/path/to/file hostname2:/path/to/file');
 }
 
 
