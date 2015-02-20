@@ -12,6 +12,7 @@
   "author": "Nick Carneiro",
   "license": "MIT",
   "dependencies": {
+    "colors": "^1.0.3",
     "ssh2": "^0.4.4"
   }
 }

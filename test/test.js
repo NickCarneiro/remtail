@@ -17,7 +17,7 @@ test('build map of hosts', function (t) {
         'indeed.com': {
             paths: ['/var/www/django.log']
         }
-    }
+    };
     t.deepEquals(hostMap, expectedHostMap);
     t.end();
 });

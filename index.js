@@ -2,6 +2,7 @@
 
 var SshClient = require('ssh2').Client;
 var hosts = require('./lib/hosts');
+var colors = require('colors');
 
 // open an ssh connection to every host and run the tail commands
 var hostsSize = 0;
@@ -25,9 +26,20 @@ for (var hostName in hosts) {
                 console.log('Connected closed to: ' + hostName);
                 conn.end();
             }).on('data', function (data) {
-                console.log(hostName + ' -- ' + data.toString('utf-8'));
+                var dataString = data.toString('utf-8');
+                var lines = dataString.split('\n');
+                lines.forEach(function(line) {
+                    if (line) {
+                        console.log(hostName.red + ' ' + line);
+                    }
+                });
+
             }).stderr.on('data', function (data) {
-                console.log(hostName + ' -- ' + data.toString('utf-8'));
+                var dataString = data.toString('utf-8');
+                var lines = dataString.split('\n');
+                lines.forEach(function(line) {
+                    console.log(hostName + ' ' + line);
+                });
             });
         });
     }.bind(this, conn, tailCommand, hostName);
