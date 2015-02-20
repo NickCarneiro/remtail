@@ -1,6 +1,6 @@
 [
   {
-    "hostname": "trillworks.com"
+    "hostname": "trillworks.com",
     "port": 22,
     "user": "bigtex",
     "password": "hunter2"
