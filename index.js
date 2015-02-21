@@ -20,6 +20,7 @@ for (var hostName in hosts) {
     // use bind to build a function that takes copies of local vars
     // from this particular iteration of the for loop
     var readyCallback = function(conn, tailCommand, hostName) {
+        var host = hosts[hostName];
         conn.exec(tailCommand, function (err, stream) {
             if (err) throw err;
             
@@ -31,7 +32,7 @@ for (var hostName in hosts) {
                 var lines = dataString.split('\n');
                 lines.forEach(function(line) {
                     if (line) {
-                        console.log(hostName.red + ' ' + line);
+                        console.log(colors[host.color](hostName) + ' ' + line);
                     }
                 });
 
