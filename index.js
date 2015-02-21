@@ -3,6 +3,7 @@
 var SshClient = require('ssh2').Client;
 var hosts = require('./lib/hosts');
 var colors = require('colors');
+var readlineSync = require('readline-sync');
 
 // open an ssh connection to every host and run the tail commands
 var hostsSize = 0;
@@ -55,7 +56,9 @@ for (var hostName in hosts) {
     } else if (host.privateKey) {
         connectionParams.privateKey = host.privateKey;
     } else {
-        connectionParams.password = prompt('Password for ' + hostName);
+        connectionParams.username = readlineSync.question('Username for ' + hostName + ':\n');
+        connectionParams.password = readlineSync.question('Password for ' + connectionParams.username +
+            '@' + hostName + ':\n', {noEchoBack: true});
     }
     
     conn.on('ready', readyCallback).connect(connectionParams);
