@@ -10,7 +10,7 @@ With [npm](https://npmjs.org) do:
 npm install -g remtail
 ```
 
-You should set up a credentials file in ~/.remtail.json of this format:
+You can optionally use a credentials file in ~/.remtail.json of this format:
 
 ```
 [
@@ -28,12 +28,12 @@ You should set up a credentials file in ~/.remtail.json of this format:
 ]
 ```
 
-You can specify an alternate credentials file with -c.
+Specify an alternate credentials file with -c.
 
 # usage
 
 ```
-trillworks.com:/var/log/nginx/access.log okpedro.com:/var/log/apache2/other_vhosts_access.log
+remtail trillworks.com:/var/log/nginx/access.log okpedro.com:/var/log/apache2/other_vhosts_access.log
 ```
 
 # development
