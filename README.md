@@ -23,7 +23,7 @@ You should set up a credentials file in ~/.remtail.json of this format:
   {
     "hostname": "indeed.com",
     "user": "woody",
-    "password": "snakeinmyboot"
+    "privateKey": "/Users/woody/.ssh/id_rsa"
   }
 ]
 ```
