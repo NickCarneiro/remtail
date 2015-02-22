@@ -2,9 +2,10 @@
 
 tail out log files from multiple remote hosts
 
+![Image of example command](/remtail.png)
+
 # install
 
-With [npm](https://npmjs.org) do:
 
 ```
 npm install -g remtail
@@ -32,8 +33,16 @@ Specify an alternate credentials file with -c.
 
 # usage
 
+Connect to as many hosts as you want.
+
 ```
 remtail trillworks.com:/var/log/nginx/access.log okpedro.com:/var/log/apache2/other_vhosts_access.log
+```
+
+Specify multiple files on the same host by repeating the hostname.
+
+```
+remtail trillworks.com:/var/log/nginx/access.log trillworks.com:/var/log/nginx/error.log
 ```
 
 # development
