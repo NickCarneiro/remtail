@@ -7,13 +7,16 @@ var buildCredentialsMap = require('../lib/creds');
 var hostPathPairs = [
     'trillworks.com:/var/log/blah.log',
     'trillworks.com:/var/log/wow.log',
-    'indeed.com:/var/www/django.log'
+    'indeed.com:/var/www/django.log',
+    'yahoo.com:/var/log/whoa.log'
 ];
 var hostMap = hostUtils.buildHostMap(hostPathPairs);
 
 var credentialsFileString = fs.readFileSync(__dirname + '/remtail.json');
 var credentialList = JSON.parse(credentialsFileString);
 var credentialsMap = buildCredentialsMap(credentialList);
+
+var expectedPrivateKey = fs.readFileSync(__dirname + '/privateKey.txt', 'utf-8');
 
 test('build map of hosts from command line args', function (t) {
 
@@ -25,6 +28,10 @@ test('build map of hosts from command line args', function (t) {
         'indeed.com': {
             color: 'yellow',
             paths: ['/var/www/django.log']
+        },
+        'yahoo.com': {
+            color: 'green',
+            paths: ['/var/log/whoa.log']
         }
     };
     t.deepEquals(hostMap, expectedHostMap);
@@ -43,6 +50,11 @@ test('build credentials map from properties file', function (t) {
         'indeed.com': {
             user: 'peter',
             password: 'blah'
+        },
+        "yahoo.com": {
+            user: 'ganley',
+            privateKey: expectedPrivateKey,
+            passphrase: true
         }
     };
     t.deepEquals(credentialsMap, expectedCredentialsMap);
@@ -67,6 +79,14 @@ test('add credentials to hosts map', function (t) {
             user: 'peter',
             password: 'blah',
             port: 22
+        },
+        'yahoo.com': {
+            color: 'green',
+            paths: ['/var/log/whoa.log'],
+            passphrase: true,
+            privateKey: expectedPrivateKey,
+            port: 22,
+            user: 'ganley'
         }
     };
     t.deepEquals(hostMap, expectedHostMap);

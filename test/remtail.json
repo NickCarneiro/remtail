@@ -9,5 +9,11 @@
     "hostname": "indeed.com",
     "user": "peter",
     "password": "blah"
+  },
+  {
+    "hostname": "yahoo.com",
+    "user": "ganley",
+    "privateKey": "privateKey.txt",
+    "passphrase": true
   }
 ]
