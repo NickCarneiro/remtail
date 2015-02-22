@@ -19,82 +19,6 @@ var fs = require('fs');
 var DEFAULT_CREDENTIALS_LOCATION = path.join(process.env['HOME'], '.remtail.json');
 
 
-if (args._.length === 0 || args.help) {
-    printUsage();
-    process.exit();
-}
-
-var hosts = hostUtils.buildHostMap(args._);
-var credentialsFilePath = args._.c || DEFAULT_CREDENTIALS_LOCATION;
-try {
-    var credentialsFileString = fs.readFileSync(credentialsFilePath, 'utf-8');
-    var credentialList = JSON.parse(credentialsFileString);
-    var credentialsMap = buildCredentialsMap(credentialList);
-} catch (e) {
-    console.log('Could not find or parse ' + credentialsFilePath);
-}
-hostUtils.addCredentials(hosts, credentialsMap);
-
-// open an ssh connection to every host and run the tail commands
-var hostsSize = 0;
-for (var hostName in hosts) {
-    hostsSize++;
-    var host = hosts[hostName];
-    var password = host.password;
-    var tailCommand = buildTailCommand(host.paths);
-    console.log('hostname: ' + hostName);
-    console.log('command: ' + tailCommand);
-    
-    var conn = new SshClient();
-
-    // use bind to build a function that takes copies of local vars
-    // from this particular iteration of the for loop
-    var readyCallback = function(conn, tailCommand, hostName) {
-        var host = hosts[hostName];
-        conn.exec(tailCommand, function (err, stream) {
-            if (err) throw err;
-            
-            stream.on('close', function (code, signal) {
-                console.log('Connected closed to: ' + hostName);
-                conn.end();
-            }).on('data', function (data) {
-                var dataString = data.toString('utf-8');
-                var lines = dataString.split('\n');
-                lines.forEach(function(line) {
-                    if (line) {
-                        console.log(colors[host.color](hostName) + ' ' + line);
-                    }
-                });
-
-            }).stderr.on('data', function (data) {
-                var dataString = data.toString('utf-8');
-                var lines = dataString.split('\n');
-                lines.forEach(function(line) {
-                    console.log(hostName + ' ' + line);
-                });
-            });
-        });
-    }.bind(this, conn, tailCommand, hostName);
-    
-    var connectionParams = {
-        host: hostName,
-        port: host.port,
-        username: host.user
-    };
-    
-    if (host.password) {
-        connectionParams.password = host.password;
-    } else if (host.privateKey) {
-        connectionParams.privateKey = host.privateKey;
-    } else {
-        connectionParams.username = readlineSync.question('Username for ' + hostName + ':\n');
-        connectionParams.password = readlineSync.question('Password for ' + connectionParams.username +
-            '@' + hostName + ':\n', {noEchoBack: true});
-    }
-    
-    conn.on('ready', readyCallback).connect(connectionParams);
-}
-
 
 /**
  * Builds an executable tail command
@@ -113,4 +37,91 @@ function buildTailCommand(paths) {
 function printUsage() {
     console.log('usage: ');
     console.log('remtail hostname:/path/to/file hostname2:/path/to/file');
+}
+
+
+function main() {
+
+    if (args._.length === 0 || args.help) {
+        printUsage();
+        process.exit();
+    }
+
+    var hosts = hostUtils.buildHostMap(args._);
+    var credentialsFilePath = args._.c || DEFAULT_CREDENTIALS_LOCATION;
+    var credentialsMap = {};
+    try {
+        var credentialsFileString = fs.readFileSync(credentialsFilePath, 'utf-8');
+        var credentialList = JSON.parse(credentialsFileString);
+        credentialsMap = buildCredentialsMap(credentialList);
+    } catch (e) {
+        console.log('Could not find or parse ' + credentialsFilePath);
+    }
+    hostUtils.addCredentials(hosts, credentialsMap);
+
+// open an ssh connection to every host and run the tail commands
+    var hostsSize = 0;
+    for (var hostName in hosts) {
+        hostsSize++;
+        var host = hosts[hostName];
+        var tailCommand = buildTailCommand(host.paths);
+        console.log('hostname: ' + hostName);
+        console.log('command: ' + tailCommand);
+
+        var conn = new SshClient();
+
+        // use bind to build a function that takes copies of local vars
+        // from this particular iteration of the for loop
+        var readyCallback = function (conn, tailCommand, hostName) {
+            var host = hosts[hostName];
+            conn.exec(tailCommand, function (err, stream) {
+                if (err) {
+                    throw err;
+                }
+
+                stream.on('close', function () {
+                    console.log('Connected closed to: ' + hostName);
+                    conn.end();
+                }).on('data', function (data) {
+                    var dataString = data.toString('utf-8');
+                    var lines = dataString.split('\n');
+                    lines.forEach(function (line) {
+                        if (line) {
+                            console.log(colors[host.color](hostName) + ' ' + line);
+                        }
+                    });
+
+                }).stderr.on('data', function (data) {
+                        var dataString = data.toString('utf-8');
+                        var lines = dataString.split('\n');
+                        lines.forEach(function (line) {
+                            console.log(hostName + ' ' + line);
+                        });
+                    });
+            });
+        }.bind(this, conn, tailCommand, hostName);
+
+        var connectionParams = {
+            host: hostName,
+            port: host.port,
+            username: host.user
+        };
+
+        if (host.password) {
+            connectionParams.password = host.password;
+        } else if (host.privateKey) {
+            connectionParams.privateKey = host.privateKey;
+        } else {
+            connectionParams.username = readlineSync.question('Username for ' + hostName + ':\n');
+            connectionParams.password = readlineSync.question('Password for ' + connectionParams.username +
+            '@' + hostName + ':\n', {noEchoBack: true});
+        }
+
+        conn.on('ready', readyCallback).connect(connectionParams);
+    }
+}
+
+
+if (require.main === module) {
+    main();
 }

@@ -4,7 +4,8 @@
   "description": "tail out log files from multiple remote hosts",
   "main": "index.js",
   "scripts": {
-    "test": "node test/test.js"
+    "test": "node test/test.js",
+    "jshint": "jshint *.js lib/*.js"
   },
   "keywords": [
     "tail"
