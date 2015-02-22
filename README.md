@@ -4,6 +4,8 @@ tail out log files from multiple remote hosts
 
 ![Image of example command](/remtail.png)
 
+#  [![NPM version][npm-image]][npm-url][![Build Status](https://travis-ci.org/NickCarneiro/remtail.svg)](https://travis-ci.org/NickCarneiro/remtail)
+
 # install
 
 
@@ -52,3 +54,7 @@ remtail trillworks.com:/var/log/nginx/access.log trillworks.com:/var/log/nginx/e
 # license
 
 MIT
+
+
+[npm-url]: https://npmjs.org/package/remtail
+[npm-image]: https://badge.fury.io/js/remtail.svg
