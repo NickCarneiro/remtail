@@ -1,5 +1,4 @@
 # remtail
-# This does not actually work yet. 
 
 tail out log files from multiple remote hosts
 
@@ -36,12 +35,12 @@ If you don't feel like having a file with all your passwords in it, send a pull 
 # usage
 
 ```
-remtail nickc@tst-job1:/var/log/jasxA-tomcat/application-logentry.log nickc@tst-job1:/var/log/jasxA-tomcat/application-error.log tst-job2:/var/log/jasxA-tomcat/application-logentry.log
+trillworks.com:/var/log/nginx/access.log okpedro.com:/var/log/apache2/other_vhosts_access.log
 ```
 
 # development
 
-```node tests/test.js```
+```node test/test.js```
 
 # license
 

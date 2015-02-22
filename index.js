@@ -1,9 +1,22 @@
 #!/usr/bin/env node
 
 var SshClient = require('ssh2').Client;
-var hosts = require('./lib/hosts');
+var hostUtils = require('./lib/hosts');
+var buildCredentialsMap = require('./lib/creds');
+var args = require('./lib/args');
 var colors = require('colors');
 var readlineSync = require('readline-sync');
+
+
+if (args._.length === 0) {
+    console.log('usage: ');
+    console.log('remtail hostname:/path/to/file hostname2:/path/to/file');
+    process.exit();
+}
+
+var hosts = hostUtils.buildHostMap(args._);
+var credentialsMap = buildCredentialsMap();
+hostUtils.addCredentials(hosts, credentialsMap);
 
 // open an ssh connection to every host and run the tail commands
 var hostsSize = 0;
