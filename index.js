@@ -111,6 +111,10 @@ function main() {
             connectionParams.password = host.password;
         } else if (host.privateKey) {
             connectionParams.privateKey = host.privateKey;
+            if (host.passphrase) {
+                connectionParams.passphrase =
+                    readlineSync.question('ssh key passphrase for ' + hostName + ':\n', {noEchoBack: true});
+            }
         } else {
             connectionParams.username = readlineSync.question('Username for ' + hostName + ':\n');
             connectionParams.password = readlineSync.question('Password for ' + connectionParams.username +
