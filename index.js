@@ -1,21 +1,38 @@
 #!/usr/bin/env node
 
+/**
+ * High level explanation:
+ *  Get credentials from credentials file and arguments and create a credentials map
+ *  Get hosts information from arguments and build a hosts map
+ *  Add the credentials map data to the hosts map
+ *  Connect to every host in the hosts map
+ */
 var SshClient = require('ssh2').Client;
 var hostUtils = require('./lib/hosts');
 var buildCredentialsMap = require('./lib/creds');
 var args = require('./lib/args');
 var colors = require('colors');
 var readlineSync = require('readline-sync');
+var path = require('path');
+var fs = require('fs');
+
+var DEFAULT_CREDENTIALS_LOCATION = path.join(process.env['HOME'], '.remtail.json');
 
 
-if (args._.length === 0) {
-    console.log('usage: ');
-    console.log('remtail hostname:/path/to/file hostname2:/path/to/file');
+if (args._.length === 0 || args.help) {
+    printUsage();
     process.exit();
 }
 
 var hosts = hostUtils.buildHostMap(args._);
-var credentialsMap = buildCredentialsMap();
+var credentialsFilePath = args._.c || DEFAULT_CREDENTIALS_LOCATION;
+try {
+    var credentialsFileString = fs.readFileSync(credentialsFilePath);
+    var credentialList = JSON.parse(credentialsFileString);
+    var credentialsMap = buildCredentialsMap(credentialList);
+} catch (e) {
+    console.log('Could not find or parse ' + credentialsFilePath);
+}
 hostUtils.addCredentials(hosts, credentialsMap);
 
 // open an ssh connection to every host and run the tail commands
@@ -78,11 +95,6 @@ for (var hostName in hosts) {
     conn.on('ready', readyCallback).connect(connectionParams);
 }
 
-if (hostsSize === 0) {
-    console.log('usage: ');
-    console.log('remtail hostname:/path/to/file hostname2:/path/to/file');
-}
-
 
 /**
  * Builds an executable tail command
@@ -95,4 +107,10 @@ function buildTailCommand(paths) {
         command += ' -F ' + path;
     });
     return command;
+}
+
+
+function printUsage() {
+    console.log('usage: ');
+    console.log('remtail hostname:/path/to/file hostname2:/path/to/file');
 }
