@@ -30,8 +30,6 @@ You should set up a credentials file in ~/.remtail.json of this format:
 
 You can specify an alternate credentials file with -c.
 
-If you don't feel like having a file with all your passwords in it, send a pull request with ssh key support.
-
 # usage
 
 ```

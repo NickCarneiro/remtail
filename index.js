@@ -27,7 +27,7 @@ if (args._.length === 0 || args.help) {
 var hosts = hostUtils.buildHostMap(args._);
 var credentialsFilePath = args._.c || DEFAULT_CREDENTIALS_LOCATION;
 try {
-    var credentialsFileString = fs.readFileSync(credentialsFilePath);
+    var credentialsFileString = fs.readFileSync(credentialsFilePath, 'utf-8');
     var credentialList = JSON.parse(credentialsFileString);
     var credentialsMap = buildCredentialsMap(credentialList);
 } catch (e) {
