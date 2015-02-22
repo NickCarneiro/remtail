@@ -111,7 +111,7 @@ function main() {
             connectionParams.password = host.password;
         } else if (host.privateKey) {
             connectionParams.privateKey = host.privateKey;
-            if (host.passphrase) {
+            if (host.privateKey.indexOf('-----BEGIN RSA PRIVATE KEY-----') !== -1) {
                 connectionParams.passphrase =
                     readlineSync.question('ssh key passphrase for ' + hostName + ':\n', {noEchoBack: true});
             }

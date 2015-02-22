@@ -13,7 +13,6 @@
   {
     "hostname": "yahoo.com",
     "user": "ganley",
-    "privateKey": "privateKey.txt",
-    "passphrase": true
+    "privateKey": "test/privateKey.txt"
   }
 ]

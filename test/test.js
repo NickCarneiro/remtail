@@ -53,8 +53,7 @@ test('build credentials map from properties file', function (t) {
         },
         "yahoo.com": {
             user: 'ganley',
-            privateKey: expectedPrivateKey,
-            passphrase: true
+            privateKey: expectedPrivateKey
         }
     };
     t.deepEquals(credentialsMap, expectedCredentialsMap);
@@ -83,7 +82,6 @@ test('add credentials to hosts map', function (t) {
         'yahoo.com': {
             color: 'green',
             paths: ['/var/log/whoa.log'],
-            passphrase: true,
             privateKey: expectedPrivateKey,
             port: 22,
             user: 'ganley'
