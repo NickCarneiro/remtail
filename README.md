@@ -29,7 +29,7 @@ You can optionally use a credentials file in ~/.remtail.json of this format:
 ]
 ```
 
-Specify an alternate credentials file with -c.
+Specify an alternate credentials file path with -c.
 
 # usage
 
