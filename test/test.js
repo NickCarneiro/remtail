@@ -72,3 +72,22 @@ test('add credentials to hosts map', function (t) {
     t.deepEquals(hostMap, expectedHostMap);
     t.end();
 });
+
+
+test('test colors wraparound', function (t) {
+    var hostPathPairs = [
+        'trillworks.com:/var/log/blah.log',
+        'yahoo.com:/var/log/wow.log',
+        'google.com:/var/www/django.log',
+        'monster.com:/var/www/django.log',
+        'indeed.com:/var/www/django.log',
+        'linkedin.com:/var/www/django.log',
+        'alexa.com:/var/www/django.log',
+        'bing.com:/var/www/django.log',
+        'microsoft.com:/var/www/django.log',
+        'gatorade.com:/var/www/django.log'
+    ];
+    var hostMap = hostUtils.buildHostMap(hostPathPairs);
+    t.equals(hostMap['gatorade.com']['color'], 'yellow');
+    t.end();
+});

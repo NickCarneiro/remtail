@@ -55,7 +55,7 @@ Specify an alternate credentials file path with -c.
 
 ## linter
 
-```npm jshint```
+```npm run-script jshint```
 
 # license
 
