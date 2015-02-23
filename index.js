@@ -15,9 +15,9 @@ var colors = require('colors');
 var readlineSync = require('readline-sync');
 var path = require('path');
 var fs = require('fs');
+var osenv = require('osenv');
 
-var DEFAULT_CREDENTIALS_LOCATION = path.join(process.env['HOME'], '.remtail.json');
-
+var DEFAULT_CREDENTIALS_LOCATION = path.join(osenv.home(), '.remtail.json');
 
 
 /**
