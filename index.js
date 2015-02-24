@@ -20,20 +20,6 @@ var osenv = require('osenv');
 var DEFAULT_CREDENTIALS_LOCATION = path.join(osenv.home(), '.remtail.json');
 
 
-/**
- * Builds an executable tail command
- *
- * @param {array} paths - an array of file paths to tail out
- */
-function buildTailCommand(paths) {
-    var command = 'tail';
-    paths.forEach(function(path) {
-        command += ' -F ' + path;
-    });
-    return command;
-}
-
-
 function printUsage() {
     console.log('usage: ');
     console.log('remtail hostname:/path/to/file hostname2:/path/to/file');
@@ -41,7 +27,6 @@ function printUsage() {
 
 
 function main() {
-
     if (args._.length === 0 || args.help) {
         printUsage();
         process.exit();
@@ -59,69 +44,88 @@ function main() {
     }
     hostUtils.addCredentials(hosts, credentialsMap);
 
-// open an ssh connection to every host and run the tail commands
+    // open an ssh connection to every host and run the tail commands
+    var connectionMap = {};
     var hostsSize = 0;
     for (var hostName in hosts) {
         hostsSize++;
         var host = hosts[hostName];
-        var tailCommand = buildTailCommand(host.paths);
-        console.log('hostname: ' + hostName);
-        console.log('command: ' + tailCommand);
 
-        var conn = new SshClient();
+        for (var i in host.paths) {
+            var file = host.paths[i];
+            var tailCommand = "tail -F " + file;
+            var displayPath = host.displayPaths[file];
+            
+            console.log('hostname: ' + hostName);
+            console.log('command: ' + tailCommand);
 
-        // use bind to build a function that takes copies of local vars
-        // from this particular iteration of the for loop
-        var readyCallback = function (conn, tailCommand, hostName) {
-            var host = hosts[hostName];
-            conn.exec(tailCommand, function (err, stream) {
-                if (err) {
-                    throw err;
-                }
+            var conn = connectionMap[hostName] || new SshClient();
 
-                stream.on('close', function () {
-                    console.log('Connected closed to: ' + hostName);
-                    conn.end();
-                }).on('data', function (data) {
-                    var dataString = data.toString('utf-8');
-                    var lines = dataString.split('\n');
-                    lines.forEach(function (line) {
-                        if (line) {
-                            console.log(colors[host.color](hostName) + ' ' + line);
-                        }
-                    });
+            // use bind to build a function that takes copies of local vars
+            // from this particular iteration of the for loop
+            var readyCallback = function(conn, tailCommand, hostName, displayPath) {
+                var host = hosts[hostName];
+                conn.exec(tailCommand, function(err, stream) {
+                    if (err) {
+                        throw err;
+                    }
 
-                }).stderr.on('data', function (data) {
+                    stream.on('close', function() {
+                        console.log('Connected closed to: ' + hostName);
+                        conn.end();
+                    }).on('data', function(data) {
                         var dataString = data.toString('utf-8');
                         var lines = dataString.split('\n');
-                        lines.forEach(function (line) {
-                            console.log(hostName + ' ' + line);
+                        lines.forEach(function(line) {
+                            if (line) {
+                                console.log(colors[host.color](hostName + ' ' + displayPath) + ' ' + line);
+                            }
                         });
-                    });
-            });
-        }.bind(this, conn, tailCommand, hostName);
 
-        var connectionParams = {
-            host: hostName,
-            port: host.port,
-            username: host.user
-        };
+                    }).stderr.on('data', function(data) {
+                            var dataString = data.toString('utf-8');
+                            var lines = dataString.split('\n');
+                            lines.forEach(function(line) {
+                                console.log(colors[host.color](hostName + ' ' + displayPath) + ' ' + line);
+                            });
+                        });
+                });
+            }.bind(this, conn, tailCommand, hostName, displayPath);
+            conn.on('ready', readyCallback);
+            
+            if (!connectionMap[hostName]) {
+                var connectionParams = {
+                    host: hostName,
+                    port: host.port,
+                    username: host.user
+                };
 
-        if (host.password) {
-            connectionParams.password = host.password;
-        } else if (host.privateKey) {
-            connectionParams.privateKey = host.privateKey;
-            if (host.privateKey.indexOf('-----BEGIN RSA PRIVATE KEY-----') !== -1) {
-                connectionParams.passphrase =
-                    readlineSync.question('ssh key passphrase for ' + hostName + ':\n', {noEchoBack: true});
+                if (!host.user) {
+                    connectionParams.username = host.user =
+                        readlineSync.question('Username for ' + hostName + ':\n');
+                }
+
+                // Authentication Method
+                if (host.password) {
+                    connectionParams.password = host.password;
+                } else if (host.privateKey) {
+                    connectionParams.privateKey = host.privateKey;
+                    if (host.passphrase) {
+                        connectionParams.passphrase = host.passphrase;
+                    } else if (host.privateKey.indexOf('-----BEGIN RSA PRIVATE KEY-----') !== -1) {
+                        connectionParams.passphrase = host.passphrase =
+                            readlineSync.question('ssh key passphrase for ' + hostName + ':\n', {noEchoBack: true});
+                    }
+                } else {
+                    var identifier = connectionParams.username + '@' + hostName;
+                    connectionParams.password = host.password =
+                        readlineSync.question('Password for ' + identifier + ':\n', {noEchoBack: true});
+                }
+
+                conn.connect(connectionParams);
+                connectionMap[hostName] = conn;
             }
-        } else {
-            connectionParams.username = readlineSync.question('Username for ' + hostName + ':\n');
-            connectionParams.password = readlineSync.question('Password for ' + connectionParams.username +
-            '@' + hostName + ':\n', {noEchoBack: true});
         }
-
-        conn.on('ready', readyCallback).connect(connectionParams);
     }
 }
 

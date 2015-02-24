@@ -8,7 +8,9 @@ var hostPathPairs = [
     'trillworks.com:/var/log/blah.log',
     'trillworks.com:/var/log/wow.log',
     'indeed.com:/var/www/django.log',
-    'yahoo.com:/var/log/whoa.log'
+    'yahoo.com:/var/log/whoa.log',
+    'github.com:/var/logs/app1/logs/application.log',
+    'github.com:/var/logs/test-app2/logs/application.log'
 ];
 var hostMap = hostUtils.buildHostMap(hostPathPairs);
 
@@ -23,15 +25,33 @@ test('build map of hosts from command line args', function (t) {
     var expectedHostMap = {
         'trillworks.com': {
             color: 'red',
-            paths: ['/var/log/blah.log', '/var/log/wow.log']
+            paths: ['/var/log/blah.log', '/var/log/wow.log'],
+            displayPaths: {
+                '/var/log/blah.log': 'blah.log',
+                '/var/log/wow.log': 'wow.log'
+            }
         },
         'indeed.com': {
             color: 'yellow',
-            paths: ['/var/www/django.log']
+            paths: ['/var/www/django.log'],
+            displayPaths: {
+                '/var/www/django.log': 'django.log'
+            }
         },
         'yahoo.com': {
             color: 'green',
-            paths: ['/var/log/whoa.log']
+            paths: ['/var/log/whoa.log'],
+            displayPaths: {
+                '/var/log/whoa.log': 'whoa.log'
+            }
+        },
+        'github.com': {
+            color: 'blue',
+            paths: ['/var/logs/app1/logs/application.log', '/var/logs/test-app2/logs/application.log'],
+            displayPaths: {
+                '/var/logs/app1/logs/application.log': 'app1',
+                '/var/logs/test-app2/logs/application.log': 'test-app2'
+            }
         }
     };
     t.deepEquals(hostMap, expectedHostMap);
@@ -70,21 +90,39 @@ test('add credentials to hosts map', function (t) {
             paths: ['/var/log/blah.log', '/var/log/wow.log'],
             user: 'bigtex',
             password: 'hunter2',
-            port: 22
+            port: 22,
+            displayPaths: {
+                '/var/log/blah.log': 'blah.log',
+                '/var/log/wow.log': 'wow.log'
+            }
         },
         'indeed.com': {
             color: 'yellow',
             paths: ['/var/www/django.log']   ,
             user: 'peter',
             password: 'blah',
-            port: 22
+            port: 22,
+            displayPaths: {
+                '/var/www/django.log': 'django.log'
+            }
         },
         'yahoo.com': {
             color: 'green',
             paths: ['/var/log/whoa.log'],
             privateKey: expectedPrivateKey,
             port: 22,
-            user: 'ganley'
+            user: 'ganley',
+            displayPaths: {
+                '/var/log/whoa.log': 'whoa.log'
+            }
+        },
+        'github.com': {
+            color: 'blue',
+            paths: ['/var/logs/app1/logs/application.log', '/var/logs/test-app2/logs/application.log'],
+            displayPaths: {
+                '/var/logs/app1/logs/application.log': 'app1',
+                '/var/logs/test-app2/logs/application.log': 'test-app2'
+            }
         }
     };
     t.deepEquals(hostMap, expectedHostMap);
