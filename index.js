@@ -107,18 +107,26 @@ function main() {
             username: host.user
         };
 
+        if (!host.user) {
+            connectionParams.username = host.user =
+                readlineSync.question('Username for ' + hostName + ':\n');
+        }
+
+        // Authentication Method
         if (host.password) {
             connectionParams.password = host.password;
         } else if (host.privateKey) {
             connectionParams.privateKey = host.privateKey;
-            if (host.privateKey.indexOf('-----BEGIN RSA PRIVATE KEY-----') !== -1) {
-                connectionParams.passphrase =
+            if (host.passphrase) {
+                connectionParams.passphrase = host.passphrase;
+            } else if (host.privateKey.indexOf('-----BEGIN RSA PRIVATE KEY-----') !== -1) {
+                connectionParams.passphrase = host.passphrase =
                     readlineSync.question('ssh key passphrase for ' + hostName + ':\n', {noEchoBack: true});
             }
         } else {
-            connectionParams.username = readlineSync.question('Username for ' + hostName + ':\n');
-            connectionParams.password = readlineSync.question('Password for ' + connectionParams.username +
-            '@' + hostName + ':\n', {noEchoBack: true});
+            var identifier = connectionParams.username + '@' + hostName;
+            connectionParams.password = host.password =
+                    readlineSync.question('Password for ' + identifier + ':\n', {noEchoBack: true});
         }
 
         conn.on('ready', readyCallback).connect(connectionParams);
