@@ -52,9 +52,9 @@ function main() {
         var host = hosts[hostName];
 
         for (var i in host.paths) {
-            var filepath = host.paths[i];
-            var tailCommand = "tail -F " + filepath;
-            var filename = path.basename(filepath);
+            var file = host.paths[i];
+            var tailCommand = "tail -F " + file;
+            var displayPath = host.displayPaths[file];
             
             console.log('hostname: ' + hostName);
             console.log('command: ' + tailCommand);
@@ -63,7 +63,7 @@ function main() {
 
             // use bind to build a function that takes copies of local vars
             // from this particular iteration of the for loop
-            var readyCallback = function(conn, tailCommand, hostName, filename) {
+            var readyCallback = function(conn, tailCommand, hostName, displayPath) {
                 var host = hosts[hostName];
                 conn.exec(tailCommand, function(err, stream) {
                     if (err) {
@@ -78,7 +78,7 @@ function main() {
                         var lines = dataString.split('\n');
                         lines.forEach(function(line) {
                             if (line) {
-                                console.log(colors[host.color](hostName + ' ' + filename) + ' ' + line);
+                                console.log(colors[host.color](hostName + ' ' + displayPath) + ' ' + line);
                             }
                         });
 
@@ -86,11 +86,11 @@ function main() {
                             var dataString = data.toString('utf-8');
                             var lines = dataString.split('\n');
                             lines.forEach(function(line) {
-                                console.log(colors[host.color](hostName + ' ' + filename) + ' ' + line);
+                                console.log(colors[host.color](hostName + ' ' + displayPath) + ' ' + line);
                             });
                         });
                 });
-            }.bind(this, conn, tailCommand, hostName, filename);
+            }.bind(this, conn, tailCommand, hostName, displayPath);
             conn.on('ready', readyCallback);
             
             if (!connectionMap[hostName]) {
