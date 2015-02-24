@@ -32,7 +32,7 @@ You can optionally use a credentials file in ~/.remtail.json of this format:
 ```
 [
   {
-    "hostname": "trillworks.com"
+    "hostname": "trillworks.com",
     "port": 22,
     "user": "buzz",
     "password": "hunter2"
