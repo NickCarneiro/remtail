@@ -86,7 +86,7 @@ function main() {
                             var dataString = data.toString('utf-8');
                             var lines = dataString.split('\n');
                             lines.forEach(function(line) {
-                                console.log(hostName + ' ' + line);
+                                console.log(colors[host.color](hostName + ' ' + filename) + ' ' + line);
                             });
                         });
                 });
