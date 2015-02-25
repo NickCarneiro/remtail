@@ -10,30 +10,26 @@
 var SshClient = require('ssh2').Client;
 var hostUtils = require('./lib/hosts');
 var buildCredentialsMap = require('./lib/creds');
-var args = require('./lib/args');
 var colors = require('colors');
 var readlineSync = require('readline-sync');
 var path = require('path');
 var fs = require('fs');
 var osenv = require('osenv');
+var program = require('commander');
+var packageJson = require('./package.json');
 
 var DEFAULT_CREDENTIALS_LOCATION = path.join(osenv.home(), '.remtail.json');
 
 
-function printUsage() {
-    console.log('usage: ');
-    console.log('remtail hostname:/path/to/file hostname2:/path/to/file');
-}
-
-
 function main() {
-    if (args._.length === 0 || args.help) {
-        printUsage();
-        process.exit();
-    }
+    program
+        .version(packageJson.version)
+        .usage('remtail [options] <hostname1>:</path/to/file> <hostname2>:</path/to/file>')
+        .option('-c, --credentials', 'Path to credentials file')
+        .parse(process.argv);
 
-    var hosts = hostUtils.buildHostMap(args._);
-    var credentialsFilePath = args._.c || DEFAULT_CREDENTIALS_LOCATION;
+    var hosts = hostUtils.buildHostMap(program.args);
+    var credentialsFilePath = program.credentials || DEFAULT_CREDENTIALS_LOCATION;
     var credentialsMap = {};
     try {
         var credentialsFileString = fs.readFileSync(credentialsFilePath, 'utf-8');
