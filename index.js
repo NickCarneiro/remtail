@@ -118,6 +118,15 @@ function main() {
                         readlineSync.question('Password for ' + identifier + ':\n', {noEchoBack: true});
                 }
 
+                conn.on('error', function(connectionParams, error) {
+                    if (error.level === 'client-socket') {
+                        console.log('Could not connect to host ' + connectionParams.host);
+                        process.exit(1);
+
+                    } else if (error.level === 'client-authentication') {
+                        console.log('Could not authenticate ' + connectionParams.username + '@' + connectionParams.host);
+                    }
+                }.bind(this, connectionParams));
                 conn.connect(connectionParams);
                 connectionMap[hostName] = conn;
             }
