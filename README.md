@@ -6,7 +6,7 @@ tail out log files from multiple remote hosts
 
 #  [![NPM version][npm-image]][npm-url][![Build Status](https://travis-ci.org/NickCarneiro/remtail.svg)](https://travis-ci.org/NickCarneiro/remtail)
 
-# install
+# install!
 
 
 ```
