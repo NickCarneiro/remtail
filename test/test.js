@@ -1,8 +1,8 @@
 var test = require('tape');
 var fs = require('fs');
 var hostUtils = require('../lib/hosts');
-var buildCredentialsMap = require('../lib/creds');
-
+var credentialUtils = require('../lib/creds');
+var parseSshConfig = require('ssh-config-parser');
 
 var hostPathPairs = [
     'trillworks.com:/var/log/blah.log',
@@ -16,7 +16,8 @@ var hostMap = hostUtils.buildHostMap(hostPathPairs);
 
 var credentialsFileString = fs.readFileSync(__dirname + '/remtail.json');
 var credentialList = JSON.parse(credentialsFileString);
-var credentialsMap = buildCredentialsMap(credentialList);
+var credentialsMap = {};
+credentialUtils.addFileCredentials(credentialsMap, credentialList);
 
 var expectedPrivateKey = fs.readFileSync(__dirname + '/privateKey.txt', 'utf-8');
 
@@ -145,5 +146,71 @@ test('test colors wraparound', function (t) {
     ];
     var hostMap = hostUtils.buildHostMap(hostPathPairs);
     t.equals(hostMap['gatorade.com']['color'], 'yellow');
+    t.end();
+});
+
+
+test('build credentials map from ssh_config', function (t) {
+    var sshConfigFile = fs.readFileSync(__dirname + '/ssh_config.txt', 'utf-8');
+    var sshConfig = parseSshConfig(sshConfigFile);
+    var credentialsMap = credentialUtils.buildSshConfigCredentialsMap({}, sshConfig);
+    var expectedCredentialsMap = {
+        'trillworks.com': {
+            user: 'nickc'
+        },
+        'indeed.com': {
+            user: 'maurice',
+            privateKey: expectedPrivateKey
+        }
+    };
+    t.deepEquals(credentialsMap, expectedCredentialsMap);
+    t.end();
+});
+
+
+test('add ssh config files to hostmap', function (t) {
+    var sshConfigFile = fs.readFileSync(__dirname + '/ssh_config.txt', 'utf-8');
+    var sshConfig = parseSshConfig(sshConfigFile);
+    var credentialsMap = credentialUtils.buildSshConfigCredentialsMap({}, sshConfig);
+    var expectedHostMap = {
+        'trillworks.com': {
+            color: 'red',
+            paths: ['/var/log/blah.log', '/var/log/wow.log'],
+            displayPaths: {
+                '/var/log/blah.log': 'blah.log',
+                '/var/log/wow.log': 'wow.log'
+            },
+            user: 'nickc',
+            port: 22
+        },
+        'indeed.com': {
+            color: 'yellow',
+            paths: ['/var/www/django.log'],
+            displayPaths: {
+                '/var/www/django.log': 'django.log'
+            },
+            privateKey: expectedPrivateKey,
+            user: 'maurice',
+            port: 22
+        },
+        'yahoo.com': {
+            color: 'green',
+            paths: ['/var/log/whoa.log'],
+            displayPaths: {
+                '/var/log/whoa.log': 'whoa.log'
+            }
+        },
+        'github.com': {
+            color: 'blue',
+            paths: ['/var/logs/app1/logs/application.log', '/var/logs/test-app2/logs/application.log'],
+            displayPaths: {
+                '/var/logs/app1/logs/application.log': 'app1',
+                '/var/logs/test-app2/logs/application.log': 'test-app2'
+            }
+        }
+    };
+    var hostMap = hostUtils.buildHostMap(hostPathPairs);
+    hostUtils.addCredentials(hostMap, credentialsMap);
+    t.deepEquals(hostMap, expectedHostMap);
     t.end();
 });

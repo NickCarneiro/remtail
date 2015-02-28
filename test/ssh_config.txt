@@ -1,0 +1,7 @@
+Host trillworks
+        HostName trillworks.com
+        User nickc
+Host indeed
+        HostName indeed.com
+        User maurice
+        IdentityFile test/privateKey.txt

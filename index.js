@@ -9,7 +9,7 @@
  */
 var SshClient = require('ssh2').Client;
 var hostUtils = require('./lib/hosts');
-var buildCredentialsMap = require('./lib/creds');
+var credentialUtils = require('./lib/creds');
 var colors = require('colors');
 var readlineSync = require('readline-sync');
 var path = require('path');
@@ -17,8 +17,10 @@ var fs = require('fs');
 var osenv = require('osenv');
 var program = require('commander');
 var packageJson = require('./package.json');
+var parseSshConfig = require('ssh-config-parser');
 
 var DEFAULT_CREDENTIALS_LOCATION = path.join(osenv.home(), '.remtail.json');
+var DEFAULT_SSH_CONFIG = path.join(osenv.home(), '.ssh/config');
 
 
 function main() {
@@ -26,15 +28,24 @@ function main() {
         .version(packageJson.version)
         .usage('remtail [options] <hostname1>:</path/to/file> <hostname2>:</path/to/file>')
         .option('-c, --credentials', 'Path to credentials file')
+        .option('-s, --sshconfig', 'Path to ssh config file')
         .parse(process.argv);
 
     var hosts = hostUtils.buildHostMap(program.args);
-    var credentialsFilePath = program.credentials || DEFAULT_CREDENTIALS_LOCATION;
     var credentialsMap = {};
+    var sshConfigFilePath = program.sshconfig || DEFAULT_SSH_CONFIG;
+    try {
+        var sshConfig = fs.readFileSync(sshConfigFilePath, 'utf-8');
+        var sshConfigCredentials = parseSshConfig(sshConfig);
+        credentialsMap = credentialUtils.buildSshConfigCredentialsMap(credentialsMap, sshConfigCredentials);
+    } catch (e) {
+        console.log('Could not find or parse ' + sshConfigFilePath);
+    }
+    var credentialsFilePath = program.credentials || DEFAULT_CREDENTIALS_LOCATION;
     try {
         var credentialsFileString = fs.readFileSync(credentialsFilePath, 'utf-8');
         var credentialList = JSON.parse(credentialsFileString);
-        credentialsMap = buildCredentialsMap(credentialList);
+        credentialsMap = credentialUtils.addFileCredentials(credentialList);
     } catch (e) {
         console.log('Could not find or parse ' + credentialsFilePath);
     }
@@ -127,7 +138,17 @@ function main() {
                         console.log('Could not authenticate ' + connectionParams.username + '@' + connectionParams.host);
                     }
                 }.bind(this, connectionParams));
-                conn.connect(connectionParams);
+                try {
+                    conn.connect(connectionParams);
+                } catch (e) {
+                    console.log('Could not connect to ' + connectionParams.host);
+                    if (e.toString().indexOf('Malformed private key') !== -1) {
+                        console.log('Incorrect passphrase for private key.');
+                    } else {
+                        console.log(e.toString());
+                    }
+                    process.exit(1);
+                }
                 connectionMap[hostName] = conn;
             }
         }
