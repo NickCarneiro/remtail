@@ -45,7 +45,7 @@ function main() {
     try {
         var credentialsFileString = fs.readFileSync(credentialsFilePath, 'utf-8');
         var credentialList = JSON.parse(credentialsFileString);
-        credentialsMap = credentialUtils.addFileCredentials(credentialList);
+        credentialsMap = credentialUtils.addFileCredentials(credentialsMap, credentialList);
     } catch (e) {
         console.log('Could not find or parse ' + credentialsFilePath);
     }
