@@ -13,7 +13,7 @@ tail out log files from multiple remote hosts
 npm install -g remtail
 ```
 
-# usage
+# basic usage
 
 Connect to as many hosts as you want.
 
@@ -27,23 +27,38 @@ Specify multiple files on the same host by repeating the hostname.
 remtail trillworks.com:/var/log/nginx/access.log trillworks.com:/var/log/nginx/error.log
 ```
 
-You can optionally use a credentials file in ~/.remtail.json of this format:
+# advanced usage
 
-```
-[
-  {
-    "hostname": "trillworks.com",
-    "port": 22,
-    "user": "buzz",
-    "password": "hunter2"
-  },
-  {
-    "hostname": "indeed.com",
-    "user": "woody",
-    "privateKey": "/Users/woody/.ssh/id_rsa"
-  }
-]
-```
+To avoid typing in passwords for every host,
+[copy your public key](http://askubuntu.com/questions/4830/easiest-way-to-copy-ssh-keys-to-another-machine)
+to the remote servers. Then add entries in your ssh config. (~/.ssh/config). Here is the format:
+
+
+    Host trillworks
+        HostName trillworks.com
+        User burt
+        IdentityFile ~/.ssh/id_rsa
+
+Specify an alternate ssh config with -s.
+
+
+If you want to live dangerously, you can throw your passwords in a json credentials file (~/.remtail.json).
+
+
+    [
+      {
+        "hostname": "trillworks.com",
+        "port": 22,
+        "user": "buzz",
+        "password": "hunter2"
+      },
+      {
+        "hostname": "indeed.com",
+        "user": "woody",
+        "privateKey": "/Users/woody/.ssh/id_rsa"
+      }
+    ]
+
 
 Specify an alternate credentials file path with -c.
 
