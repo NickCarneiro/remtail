@@ -27,8 +27,8 @@ function main() {
     program
         .version(packageJson.version)
         .usage('remtail [options] <hostname1>:</path/to/file> <hostname2>:</path/to/file>')
-        .option('-c, --credentials', 'Path to credentials file')
-        .option('-s, --sshconfig', 'Path to ssh config file')
+        .option('-c, --credentials [path]', 'Path to credentials file')
+        .option('-s, --sshconfig [path]', 'Path to ssh config file')
         .parse(process.argv);
 
     var hosts = hostUtils.buildHostMap(program.args);
@@ -152,6 +152,9 @@ function main() {
                 connectionMap[hostName] = conn;
             }
         }
+    }
+    if (program.args.length === 0) {
+        program.outputHelp();
     }
 }
 
