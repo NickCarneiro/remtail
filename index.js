@@ -19,6 +19,9 @@ var program = require('commander');
 var packageJson = require('./package.json');
 var parseSshConfig = require('ssh-config-parser');
 
+var logger = require('winston');
+logger.cli();
+
 var DEFAULT_CREDENTIALS_LOCATION = path.join(osenv.home(), '.remtail.json');
 var DEFAULT_SSH_CONFIG = path.join(osenv.home(), '.ssh', 'config');
 
@@ -29,6 +32,7 @@ function main() {
         .usage('remtail [options] <hostname1>:</path/to/file> <hostname2>:</path/to/file>')
         .option('-c, --credentials [path]', 'Path to credentials file')
         .option('-s, --sshconfig [path]', 'Path to ssh config file')
+        .option('-v, --verbose', 'Be more verbose when running the setup')
         .parse(process.argv);
 
     if (program.args.length === 0) {
@@ -36,24 +40,41 @@ function main() {
         process.exit(1);
     }
 
-    var hosts = hostUtils.buildHostMap(program.args);
+    if (program.verbose) {
+        logger.level = 'debug';
+    }
+
     var credentialsMap = {};
+
     var sshConfigFilePath = program.sshconfig || DEFAULT_SSH_CONFIG;
-    try {
-        var sshConfig = fs.readFileSync(sshConfigFilePath, 'utf-8');
-        var sshConfigCredentials = parseSshConfig(sshConfig);
-        credentialsMap = credentialUtils.buildSshConfigCredentialsMap(credentialsMap, sshConfigCredentials);
-    } catch (e) {
-        console.log('Could not find or parse ' + sshConfigFilePath);
+    logger.debug('Attempting with ssh config file [%s]', sshConfigFilePath);
+    if (fs.existsSync(sshConfigFilePath)) {
+        try {
+            var sshConfig = fs.readFileSync(sshConfigFilePath, 'utf-8');
+            var sshConfigCredentials = parseSshConfig(sshConfig);
+            credentialsMap = credentialUtils.buildSshConfigCredentialsMap(credentialsMap, sshConfigCredentials);
+        } catch (e) {
+            logger.error('Could not parse ssh config file [%s]', sshConfigFilePath, e);
+        }
+    } else {
+        logger.debug('Failed to locate ssh config file [%s]', sshConfigFilePath);
     }
+
     var credentialsFilePath = program.credentials || DEFAULT_CREDENTIALS_LOCATION;
-    try {
-        var credentialsFileString = fs.readFileSync(credentialsFilePath, 'utf-8');
-        var credentialList = JSON.parse(credentialsFileString);
-        credentialsMap = credentialUtils.addFileCredentials(credentialsMap, credentialList);
-    } catch (e) {
-        console.log('Could not find or parse ' + credentialsFilePath);
+    logger.debug('Attempting with credentials file [%s]', credentialsFilePath);
+    if (fs.existsSync(credentialsFilePath)) {
+        try {
+            var credentialsFileString = fs.readFileSync(credentialsFilePath, 'utf-8');
+            var credentialList = JSON.parse(credentialsFileString);
+            credentialsMap = credentialUtils.addFileCredentials(credentialsMap, credentialList);
+        } catch (e) {
+            logger.error('Could not parse credentials file [%s]', credentialsFilePath, e);
+        }
+    } else {
+        logger.debug('Failed to locate credentials file [%s]', credentialsFilePath);
     }
+
+    var hosts = hostUtils.buildHostMap(program.args);
     hostUtils.addCredentials(hosts, credentialsMap);
 
     // open an ssh connection to every host and run the tail commands
