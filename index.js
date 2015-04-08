@@ -20,7 +20,7 @@ var packageJson = require('./package.json');
 var parseSshConfig = require('ssh-config-parser');
 
 var DEFAULT_CREDENTIALS_LOCATION = path.join(osenv.home(), '.remtail.json');
-var DEFAULT_SSH_CONFIG = path.join(osenv.home(), '.ssh/config');
+var DEFAULT_SSH_CONFIG = path.join(osenv.home(), '.ssh', 'config');
 
 
 function main() {
@@ -30,6 +30,11 @@ function main() {
         .option('-c, --credentials [path]', 'Path to credentials file')
         .option('-s, --sshconfig [path]', 'Path to ssh config file')
         .parse(process.argv);
+
+    if (program.args.length === 0) {
+        program.outputHelp();
+        process.exit(1);
+    }
 
     var hosts = hostUtils.buildHostMap(program.args);
     var credentialsMap = {};
@@ -152,9 +157,6 @@ function main() {
                 connectionMap[hostName] = conn;
             }
         }
-    }
-    if (program.args.length === 0) {
-        program.outputHelp();
     }
 }
 
