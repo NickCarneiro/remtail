@@ -11,6 +11,9 @@
     "tail"
   ],
   "author": "Nick Carneiro",
+  "contributors": [
+    "Jeremy Pitzeruse"
+  ],
   "license": "MIT",
   "dependencies": {
     "colors": "^1.0.3",
