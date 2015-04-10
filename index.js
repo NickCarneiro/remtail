@@ -24,12 +24,28 @@ logger.cli();
 
 var DEFAULT_CREDENTIALS_LOCATION = path.join(osenv.home(), '.remtail.json');
 var DEFAULT_SSH_CONFIG = path.join(osenv.home(), '.ssh', 'config');
+var AUTOCOMPLETE_FILE = path.join(osenv.home(), '.remtail_autocomplete');
+
+var tabtab = require('tabtab');
+
+if(process.argv.slice(2)[0] === 'completion') return tabtab.complete('remtail', function(err, data) {
+    // simply return here if there's an error or data not provided.
+    // stderr not showing on completions
+    if(err || !data) return;
+
+    if(/^--\w?/.test(data.last)) return tabtab.log(['help', 'version', 'credentials', 'sshconfig', 'verbose'], data, '--');
+    if(/^-\w?/.test(data.last)) return tabtab.log(['h', 'v', 'c', 's', 'v'], data, '-');
+
+
+    tabtab.log(['list', 'of', 'commands'], data);
+});
+
 
 
 function main() {
     program
         .version(packageJson.version)
-        .usage('remtail [options] <hostname1>:</path/to/file> <hostname2>:</path/to/file>')
+        .usage('[options] <hostname1>:</path/to/file> <hostname2>:</path/to/file>')
         .option('-c, --credentials [path]', 'Path to credentials file')
         .option('-s, --sshconfig [path]', 'Path to ssh config file')
         .option('-v, --verbose', 'Be more verbose when running the setup')
@@ -185,3 +201,4 @@ function main() {
 if (require.main === module) {
     main();
 }
+
