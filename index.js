@@ -75,6 +75,10 @@ function main() {
     }
 
     var hosts = hostUtils.buildHostMap(program.args);
+    logger.debug('Credentials');
+    logger.debug(JSON.stringify(credentialsMap, null, 2));
+    logger.debug('Hosts');
+    logger.debug(JSON.stringify(hosts, null, 2));
     hostUtils.addCredentials(hosts, credentialsMap);
 
     // open an ssh connection to every host and run the tail commands
@@ -145,7 +149,7 @@ function main() {
                     connectionParams.privateKey = host.privateKey;
                     if (host.passphrase) {
                         connectionParams.passphrase = host.passphrase;
-                    } else if (host.privateKey.indexOf('-----BEGIN RSA PRIVATE KEY-----') !== -1) {
+                    } else if (host.privateKey.indexOf('ENCRYPTED') !== -1) {
                         connectionParams.passphrase = host.passphrase =
                             readlineSync.question('ssh key passphrase for ' + hostName + ':\n', {noEchoBack: true});
                     }
