@@ -4,6 +4,8 @@ var hostUtils = require('../lib/hosts');
 var credentialUtils = require('../lib/creds');
 var parseSshConfig = require('ssh-config-parser');
 
+require('./lib/test-creds');
+
 var hostPathPairs = [
     'trillworks.com:/var/log/blah.log',
     'trillworks.com:/var/log/wow.log',
