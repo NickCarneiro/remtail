@@ -53,7 +53,7 @@ If you want to live dangerously, you can throw your passwords in a json credenti
         "password": "hunter2"
       },
       {
-        "hostname": "indeed.com",
+        "hostname": "globcong.com",
         "user": "woody",
         "privateKey": "/Users/woody/.ssh/id_rsa"
       }

@@ -2,7 +2,6 @@ var credentialUtil = require('../../lib/creds');
 var fs = require('fs');
 var path = require('path');
 var test = require('tape');
-var objectToArray = require('../../lib/hosts').objectToArray;
 
 var SSH_CONFIG_FILE = path.join(__dirname, '..', 'ssh_config.txt');
 var GAURAV_SSH_CONFIG_FILE = path.join(__dirname, '..', 'gaurav_ssh_config.txt');
@@ -24,8 +23,8 @@ test('ssh config parsing', function(t) {
             HostName: 'trillworks.com',
             User: 'nickc'
         }, {
-            Host: 'indeed',
-            HostName: 'indeed.com',
+            Host: 'globcong',
+            HostName: 'globcong.com',
             User: 'maurice',
             IdentityFile: 'test/privateKey.txt'
         }
@@ -43,7 +42,7 @@ test('basic ssh credentials map', function(t) {
         'trillworks.com': {
             user: 'nickc'
         },
-        'indeed.com': {
+        'globcong.com': {
             user: 'maurice',
             privateKey: PRIVATE_KEY_CONTENTS
         }
@@ -63,7 +62,7 @@ test('basic remtail credentials map', function (t) {
             user: 'bigtex',
             password: 'hunter2'
         },
-        'indeed.com': {
+        'globcong.com': {
             user: 'peter',
             password: 'blah'
         },
@@ -87,7 +86,7 @@ test('merging credentials maps', function(t) {
             user: 'bigtex',
             password: 'hunter2'
         },
-        'indeed.com': {
+        'globcong.com': {
             user: 'peter',
             password: 'blah',
             privateKey: PRIVATE_KEY_CONTENTS
@@ -109,23 +108,23 @@ test('merging credentials maps', function(t) {
 
 test('gaurav ssh config with ForwardAgent entry', function(t) {
     var expectedCredentialsMap = {
-        'ggmathur.ausoff.indeed.net': {
+        'ggmathur.ausoff.globcong.net': {
             user: 'gaurav',
             privateKey: PRIVATE_KEY_CONTENTS
         },
-        'tst-user1.indeed.net': {
+        'tst-user1.globcong.net': {
             user: 'gaurav',
             privateKey: PRIVATE_KEY_CONTENTS
         },
-        'tst-user2.indeed.net': {
+        'tst-user2.globcong.net': {
             user: 'gaurav',
             privateKey: PRIVATE_KEY_CONTENTS
         },
-        'tst-svc1.indeed.net': {
+        'tst-svc1.globcong.net': {
             user: 'gaurav',
             privateKey: PRIVATE_KEY_CONTENTS
         },
-        'tst-svc2.indeed.net': {
+        'tst-svc2.globcong.net': {
             user: 'gaurav',
             privateKey: PRIVATE_KEY_CONTENTS
         }
