@@ -1,0 +1,22 @@
+Host ggmathur
+  User gaurav
+  HostName ggmathur.ausoff.indeed.net
+  IdentityFile test/privateKey.txt
+Host tst-user1
+  User gaurav
+  HostName tst-user1.indeed.net
+  IdentityFile test/privateKey.txt
+Host tst-user2
+  User gaurav
+  HostName tst-user2.indeed.net
+  IdentityFile test/privateKey.txt
+Host tst-svc1
+  User gaurav
+  HostName tst-svc1.indeed.net
+  IdentityFile test/privateKey.txt
+Host tst-svc2
+  User gaurav
+  HostName tst-svc2.indeed.net
+  IdentityFile test/privateKey.txt
+Host ausoff-releng1.ausoff.indeed.net
+  ForwardAgent yes

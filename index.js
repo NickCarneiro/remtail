@@ -17,7 +17,6 @@ var fs = require('fs');
 var osenv = require('osenv');
 var program = require('commander');
 var packageJson = require('./package.json');
-var parseSshConfig = require('ssh-config-parser');
 
 var logger = require('winston');
 logger.cli();
@@ -29,7 +28,7 @@ var DEFAULT_SSH_CONFIG = path.join(osenv.home(), '.ssh', 'config');
 function main() {
     program
         .version(packageJson.version)
-        .usage('remtail [options] <hostname1>:</path/to/file> <hostname2>:</path/to/file>')
+        .usage('[options] <hostname1>:</path/to/file> <hostname2>:</path/to/file>')
         .option('-c, --credentials [path]', 'Path to credentials file')
         .option('-s, --sshconfig [path]', 'Path to ssh config file')
         .option('-v, --verbose', 'Be more verbose when running the setup')
@@ -51,7 +50,7 @@ function main() {
     if (fs.existsSync(sshConfigFilePath)) {
         try {
             var sshConfig = fs.readFileSync(sshConfigFilePath, 'utf-8');
-            var sshConfigCredentials = parseSshConfig(sshConfig);
+            var sshConfigCredentials = credentialUtils.parseSshConfig(sshConfig);
             credentialsMap = credentialUtils.buildSshConfigCredentialsMap(credentialsMap, sshConfigCredentials);
         } catch (e) {
             logger.error('Could not parse ssh config file [%s]', sshConfigFilePath, e);

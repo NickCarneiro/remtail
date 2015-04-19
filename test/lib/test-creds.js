@@ -1,18 +1,20 @@
 var credentialUtil = require('../../lib/creds');
 var fs = require('fs');
-var parseSshConfig = require('ssh-config-parser');
 var path = require('path');
 var test = require('tape');
+var objectToArray = require('../../lib/hosts').objectToArray;
 
 var SSH_CONFIG_FILE = path.join(__dirname, '..', 'ssh_config.txt');
+var GAURAV_SSH_CONFIG_FILE = path.join(__dirname, '..', 'gaurav_ssh_config.txt');
 var REMTAIL_JSON_FILE = path.join(__dirname, '..', 'remtail.json');
 var PRIVATE_KEY_FILE = path.join(__dirname, '..', 'privateKey.txt');
 
 var SSH_CONFIG_CONTENTS = fs.readFileSync(SSH_CONFIG_FILE, 'UTF-8');
+var GAURAV_SSH_CONFIG_CONTENTS = fs.readFileSync(GAURAV_SSH_CONFIG_FILE, 'UTF-8');
 var REMTAIL_JSON_CONTENTS = fs.readFileSync(REMTAIL_JSON_FILE, 'UTF-8');
 var PRIVATE_KEY_CONTENTS = fs.readFileSync(PRIVATE_KEY_FILE, 'UTF-8');
 
-var SSH_CONFIG = parseSshConfig(SSH_CONFIG_CONTENTS);
+var SSH_CONFIG = credentialUtil.parseSshConfig(SSH_CONFIG_CONTENTS);
 var REMTAIL_JSON = JSON.parse(REMTAIL_JSON_CONTENTS);
 
 test('ssh config parsing', function(t) {
@@ -29,7 +31,7 @@ test('ssh config parsing', function(t) {
         }
     ];
 
-    var sshConfig = parseSshConfig(SSH_CONFIG_CONTENTS);
+    var sshConfig = credentialUtil.parseSshConfig(SSH_CONFIG_CONTENTS);
 
     t.deepEquals(sshConfig, expectedSshConfig);
     t.end();
@@ -99,6 +101,39 @@ test('merging credentials maps', function(t) {
     var credentialsMap = {};
     credentialUtil.buildSshConfigCredentialsMap(credentialsMap, SSH_CONFIG);
     credentialUtil.addFileCredentials(credentialsMap, REMTAIL_JSON);
+
+    t.deepEquals(credentialsMap, expectedCredentialsMap);
+    t.end();
+});
+
+
+test('gaurav ssh config with ForwardAgent entry', function(t) {
+    var expectedCredentialsMap = {
+        'ggmathur.ausoff.indeed.net': {
+            user: 'gaurav',
+            privateKey: PRIVATE_KEY_CONTENTS
+        },
+        'tst-user1.indeed.net': {
+            user: 'gaurav',
+            privateKey: PRIVATE_KEY_CONTENTS
+        },
+        'tst-user2.indeed.net': {
+            user: 'gaurav',
+            privateKey: PRIVATE_KEY_CONTENTS
+        },
+        'tst-svc1.indeed.net': {
+            user: 'gaurav',
+            privateKey: PRIVATE_KEY_CONTENTS
+        },
+        'tst-svc2.indeed.net': {
+            user: 'gaurav',
+            privateKey: PRIVATE_KEY_CONTENTS
+        }
+    };
+
+
+    var gauravSshConfig = credentialUtil.parseSshConfig(GAURAV_SSH_CONFIG_CONTENTS);
+    var credentialsMap = credentialUtil.buildSshConfigCredentialsMap({}, gauravSshConfig);
 
     t.deepEquals(credentialsMap, expectedCredentialsMap);
     t.end();

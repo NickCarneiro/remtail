@@ -1,6 +1,6 @@
 {
   "name": "remtail",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "tail out log files from multiple remote hosts",
   "main": "index.js",
   "scripts": {
@@ -20,7 +20,7 @@
     "commander": "^2.6.0",
     "osenv": "^0.1.0",
     "readline-sync": "^0.5.6",
-    "ssh-config-parser": "0.0.0",
+    "ssh-config": "^0.1.0",
     "ssh2": "^0.4.4",
     "winston": "^1.0.0"
   },

@@ -2,7 +2,6 @@ var test = require('tape');
 var fs = require('fs');
 var hostUtils = require('../lib/hosts');
 var credentialUtils = require('../lib/creds');
-var parseSshConfig = require('ssh-config-parser');
 
 require('./lib/test-creds');
 
@@ -154,7 +153,7 @@ test('test colors wraparound', function (t) {
 
 test('build credentials map from ssh_config', function (t) {
     var sshConfigFile = fs.readFileSync(__dirname + '/ssh_config.txt', 'utf-8');
-    var sshConfig = parseSshConfig(sshConfigFile);
+    var sshConfig = credentialUtils.parseSshConfig(sshConfigFile);
     var credentialsMap = credentialUtils.buildSshConfigCredentialsMap({}, sshConfig);
     var expectedCredentialsMap = {
         'trillworks.com': {
@@ -172,7 +171,7 @@ test('build credentials map from ssh_config', function (t) {
 
 test('add ssh config files to hostmap', function (t) {
     var sshConfigFile = fs.readFileSync(__dirname + '/ssh_config.txt', 'utf-8');
-    var sshConfig = parseSshConfig(sshConfigFile);
+    var sshConfig = credentialUtils.parseSshConfig(sshConfigFile);
     var credentialsMap = credentialUtils.buildSshConfigCredentialsMap({}, sshConfig);
     var expectedHostMap = {
         'trillworks.com': {
