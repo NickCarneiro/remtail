@@ -2,12 +2,13 @@ var test = require('tape');
 var fs = require('fs');
 var hostUtils = require('../lib/hosts');
 var credentialUtils = require('../lib/creds');
-var parseSshConfig = require('ssh-config-parser');
+
+require('./lib/test-creds');
 
 var hostPathPairs = [
     'trillworks.com:/var/log/blah.log',
     'trillworks.com:/var/log/wow.log',
-    'indeed.com:/var/www/django.log',
+    'globcong.com:/var/www/django.log',
     'yahoo.com:/var/log/whoa.log',
     'github.com:/var/logs/app1/logs/application.log',
     'github.com:/var/logs/test-app2/logs/application.log'
@@ -32,7 +33,7 @@ test('build map of hosts from command line args', function (t) {
                 '/var/log/wow.log': 'wow.log'
             }
         },
-        'indeed.com': {
+        'globcong.com': {
             color: 'yellow',
             paths: ['/var/www/django.log'],
             displayPaths: {
@@ -68,7 +69,7 @@ test('build credentials map from properties file', function (t) {
             user: 'bigtex',
             password: 'hunter2'
         },
-        'indeed.com': {
+        'globcong.com': {
             user: 'peter',
             password: 'blah'
         },
@@ -97,7 +98,7 @@ test('add credentials to hosts map', function (t) {
                 '/var/log/wow.log': 'wow.log'
             }
         },
-        'indeed.com': {
+        'globcong.com': {
             color: 'yellow',
             paths: ['/var/www/django.log']   ,
             user: 'peter',
@@ -137,7 +138,7 @@ test('test colors wraparound', function (t) {
         'yahoo.com:/var/log/wow.log',
         'google.com:/var/www/django.log',
         'monster.com:/var/www/django.log',
-        'indeed.com:/var/www/django.log',
+        'globcong.com:/var/www/django.log',
         'linkedin.com:/var/www/django.log',
         'alexa.com:/var/www/django.log',
         'bing.com:/var/www/django.log',
@@ -152,13 +153,13 @@ test('test colors wraparound', function (t) {
 
 test('build credentials map from ssh_config', function (t) {
     var sshConfigFile = fs.readFileSync(__dirname + '/ssh_config.txt', 'utf-8');
-    var sshConfig = parseSshConfig(sshConfigFile);
+    var sshConfig = credentialUtils.parseSshConfig(sshConfigFile);
     var credentialsMap = credentialUtils.buildSshConfigCredentialsMap({}, sshConfig);
     var expectedCredentialsMap = {
         'trillworks.com': {
             user: 'nickc'
         },
-        'indeed.com': {
+        'globcong.com': {
             user: 'maurice',
             privateKey: expectedPrivateKey
         }
@@ -170,7 +171,7 @@ test('build credentials map from ssh_config', function (t) {
 
 test('add ssh config files to hostmap', function (t) {
     var sshConfigFile = fs.readFileSync(__dirname + '/ssh_config.txt', 'utf-8');
-    var sshConfig = parseSshConfig(sshConfigFile);
+    var sshConfig = credentialUtils.parseSshConfig(sshConfigFile);
     var credentialsMap = credentialUtils.buildSshConfigCredentialsMap({}, sshConfig);
     var expectedHostMap = {
         'trillworks.com': {
@@ -183,7 +184,7 @@ test('add ssh config files to hostmap', function (t) {
             user: 'nickc',
             port: 22
         },
-        'indeed.com': {
+        'globcong.com': {
             color: 'yellow',
             paths: ['/var/www/django.log'],
             displayPaths: {

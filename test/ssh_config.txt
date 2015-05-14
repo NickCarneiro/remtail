@@ -1,7 +1,7 @@
 Host trillworks
         HostName trillworks.com
         User nickc
-Host indeed
-        HostName indeed.com
+Host globcong
+        HostName globcong.com
         User maurice
         IdentityFile test/privateKey.txt
