@@ -44,6 +44,8 @@ Specify an alternate ssh config with -s.
 
 If you want to live dangerously, you can throw your passwords in a json credentials file (~/.remtail.json).
 
+*WARNING: This is deprecated and will be removed in version 1.0.*
+
 
     [
       {
