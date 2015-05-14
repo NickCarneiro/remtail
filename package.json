@@ -2,7 +2,7 @@
   "name": "remtail",
   "version": "0.0.14",
   "description": "tail out log files from multiple remote hosts",
-  "main": "index.js",
+  "main": "remtail.js",
   "scripts": {
     "test": "node test/test.js",
     "jshint": "jshint *.js lib/*.js"
@@ -29,6 +29,6 @@
     "tape": "^3.5.0"
   },
   "bin": {
-    "remtail": "index.js"
+    "remtail": "remtail.js"
   }
 }
