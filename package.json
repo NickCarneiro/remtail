@@ -1,6 +1,6 @@
 {
   "name": "remtail",
-  "version": "0.0.14",
+  "version": "0.1.0",
   "description": "tail out log files from multiple remote hosts",
   "main": "remtail.js",
   "scripts": {

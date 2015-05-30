@@ -32,12 +32,23 @@ function main() {
         .option('-c, --credentials [path]', 'Path to credentials file [DEPRECATED]')
         .option('-s, --sshconfig [path]', 'Path to ssh config file')
         .option('-v, --verbose', 'Be more verbose when running the setup')
+        .option('-h, --hosts', 'Print out the current hosts configuration')
         .parse(process.argv);
+
+    var sshConfigFilePath = program.sshconfig || DEFAULT_SSH_CONFIG;
+    if (program.hosts) {
+        // look for default sshconfig and credentials files, parse them and print them out
+        var sshConfig = fs.readFileSync(sshConfigFilePath, 'utf-8');
+        var sshConfigCredentials = credentialUtils.parseSshConfig(sshConfig);
+        console.log(sshConfigCredentials);
+        process.exit(0);
+    }
 
     if (program.args.length === 0) {
         program.outputHelp();
         process.exit(1);
     }
+
 
     if (program.verbose) {
         logger.level = 'debug';
@@ -45,7 +56,6 @@ function main() {
 
     var credentialsMap = {};
 
-    var sshConfigFilePath = program.sshconfig || DEFAULT_SSH_CONFIG;
     logger.debug('Attempting with ssh config file [%s]', sshConfigFilePath);
     if (fs.existsSync(sshConfigFilePath)) {
         try {
