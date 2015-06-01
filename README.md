@@ -42,27 +42,16 @@ to the remote servers. Then add entries in your ssh config. (~/.ssh/config). Her
 Specify an alternate ssh config with -s.
 
 
-If you want to live dangerously, you can throw your passwords in a json credentials file (~/.remtail.json).
+If you do not want to authenticate with a public key, you can include your password in your ssh config file.
+Notice the # sign at the beginning of the line.
 
-*WARNING: This is deprecated and will be removed in version 1.0.*
-
-
-    [
-      {
-        "hostname": "trillworks.com",
-        "port": 22,
-        "user": "buzz",
-        "password": "hunter2"
-      },
-      {
-        "hostname": "globcong.com",
-        "user": "woody",
-        "privateKey": "/Users/woody/.ssh/id_rsa"
-      }
-    ]
+    Host trillworks
+        HostName trillworks.com
+        User burt
+        #Password hunter2
 
 
-Specify an alternate credentials file path with -c.
+This is generally considered a bad idea.
 
 # development
 

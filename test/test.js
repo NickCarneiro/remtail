@@ -15,11 +15,6 @@ var hostPathPairs = [
 ];
 var hostMap = hostUtils.buildHostMap(hostPathPairs);
 
-var credentialsFileString = fs.readFileSync(__dirname + '/remtail.json');
-var credentialList = JSON.parse(credentialsFileString);
-var credentialsMap = {};
-credentialUtils.addFileCredentials(credentialsMap, credentialList);
-
 var expectedPrivateKey = fs.readFileSync(__dirname + '/privateKey.txt', 'utf-8');
 
 test('build map of hosts from command line args', function (t) {
@@ -43,77 +38,6 @@ test('build map of hosts from command line args', function (t) {
         'yahoo.com': {
             color: 'green',
             paths: ['/var/log/whoa.log'],
-            displayPaths: {
-                '/var/log/whoa.log': 'whoa.log'
-            }
-        },
-        'github.com': {
-            color: 'blue',
-            paths: ['/var/logs/app1/logs/application.log', '/var/logs/test-app2/logs/application.log'],
-            displayPaths: {
-                '/var/logs/app1/logs/application.log': 'app1',
-                '/var/logs/test-app2/logs/application.log': 'test-app2'
-            }
-        }
-    };
-    t.deepEquals(hostMap, expectedHostMap);
-    t.end();
-});
-
-
-test('build credentials map from properties file', function (t) {
-
-    var expectedCredentialsMap = {
-        'trillworks.com': {
-            port: 22,
-            user: 'bigtex',
-            password: 'hunter2'
-        },
-        'globcong.com': {
-            user: 'peter',
-            password: 'blah'
-        },
-        "yahoo.com": {
-            user: 'ganley',
-            privateKey: expectedPrivateKey
-        }
-    };
-    t.deepEquals(credentialsMap, expectedCredentialsMap);
-    t.end();
-});
-
-
-test('add credentials to hosts map', function (t) {
-    hostUtils.addCredentials(hostMap, credentialsMap);
-
-    var expectedHostMap = {
-        'trillworks.com': {
-            color: 'red',
-            paths: ['/var/log/blah.log', '/var/log/wow.log'],
-            user: 'bigtex',
-            password: 'hunter2',
-            port: 22,
-            displayPaths: {
-                '/var/log/blah.log': 'blah.log',
-                '/var/log/wow.log': 'wow.log'
-            }
-        },
-        'globcong.com': {
-            color: 'yellow',
-            paths: ['/var/www/django.log']   ,
-            user: 'peter',
-            password: 'blah',
-            port: 22,
-            displayPaths: {
-                '/var/www/django.log': 'django.log'
-            }
-        },
-        'yahoo.com': {
-            color: 'green',
-            paths: ['/var/log/whoa.log'],
-            privateKey: expectedPrivateKey,
-            port: 22,
-            user: 'ganley',
             displayPaths: {
                 '/var/log/whoa.log': 'whoa.log'
             }

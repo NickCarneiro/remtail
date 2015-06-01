@@ -21,7 +21,6 @@ var packageJson = require('./package.json');
 var logger = require('winston');
 logger.cli();
 
-var DEFAULT_CREDENTIALS_LOCATION = path.join(osenv.home(), '.remtail.json');
 var DEFAULT_SSH_CONFIG = path.join(osenv.home(), '.ssh', 'config');
 
 
@@ -29,7 +28,6 @@ function main() {
     program
         .version(packageJson.version)
         .usage('[options] <hostname1>:</path/to/file> <hostname2>:</path/to/file>')
-        .option('-c, --credentials [path]', 'Path to credentials file [DEPRECATED]')
         .option('-s, --sshconfig [path]', 'Path to ssh config file')
         .option('-v, --verbose', 'Be more verbose when running the setup')
         .option('-h, --hosts', 'Print out the current hosts configuration')
@@ -67,20 +65,6 @@ function main() {
         }
     } else {
         logger.debug('Failed to locate ssh config file [%s]', sshConfigFilePath);
-    }
-
-    var credentialsFilePath = program.credentials || DEFAULT_CREDENTIALS_LOCATION;
-    logger.debug('Attempting with credentials file [%s]', credentialsFilePath);
-    if (fs.existsSync(credentialsFilePath)) {
-        try {
-            var credentialsFileString = fs.readFileSync(credentialsFilePath, 'utf-8');
-            var credentialList = JSON.parse(credentialsFileString);
-            credentialsMap = credentialUtils.addFileCredentials(credentialsMap, credentialList);
-        } catch (e) {
-            logger.error('Could not parse credentials file [%s]', credentialsFilePath, e);
-        }
-    } else {
-        logger.debug('Failed to locate credentials file [%s]', credentialsFilePath);
     }
 
     var hosts = hostUtils.buildHostMap(program.args);
