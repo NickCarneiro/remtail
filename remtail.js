@@ -10,6 +10,7 @@
 var SshClient = require('ssh2').Client;
 var hostUtils = require('./lib/hosts');
 var credentialUtils = require('./lib/creds');
+var grepUtils = require('./lib/grep');
 var colors = require('colors');
 var readlineSync = require('readline-sync');
 var path = require('path');
@@ -31,6 +32,7 @@ function main() {
         .usage('[options] <hostname1>:</path/to/file> <hostname2>:</path/to/file>')
         .option('-c, --credentials [path]', 'Path to credentials file [DEPRECATED]')
         .option('-s, --sshconfig [path]', 'Path to ssh config file')
+        .option('-g, --grep [regex]', 'Regular expression to filter output on')
         .option('-v, --verbose', 'Be more verbose when running the setup')
         .parse(process.argv);
 
@@ -114,7 +116,17 @@ function main() {
                         var lines = dataString.split('\n');
                         lines.forEach(function(line) {
                             if (line) {
-                                console.log(colors[host.color](hostName + ' ' + displayPath) + ' ' + line);
+                                if (program.grep) {
+                                    var re = new RegExp(program.grep);
+                                    if (line.match(re)) {
+                                        var highlightedLine = grepUtils.highlightString(line, re);
+                                        var coloredLine = colors[host.color](hostName + ' ' + displayPath) + ' ' +
+                                            highlightedLine;
+                                        console.log(coloredLine);
+                                    }
+                                } else {
+                                    console.log(colors[host.color](hostName + ' ' + displayPath) + ' ' + line);
+                                }
                             }
                         });
 
@@ -122,6 +134,7 @@ function main() {
                             var dataString = data.toString('utf-8');
                             var lines = dataString.split('\n');
                             lines.forEach(function(line) {
+                                // stderr is ungreppable for now
                                 console.log(colors[host.color](hostName + ' ' + displayPath) + ' ' + line);
                             });
                         });
