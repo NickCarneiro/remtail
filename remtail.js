@@ -33,6 +33,7 @@ function main() {
         .option('-c, --credentials [path]', 'Path to credentials file [DEPRECATED]')
         .option('-s, --sshconfig [path]', 'Path to ssh config file')
         .option('-g, --grep [regex]', 'Regular expression to filter output on')
+        .option('-i, --grepi [regex]', 'Case-insensitive regular expression to filter output on')
         .option('-v, --verbose', 'Be more verbose when running the setup')
         .parse(process.argv);
 
@@ -116,8 +117,13 @@ function main() {
                         var lines = dataString.split('\n');
                         lines.forEach(function(line) {
                             if (line) {
-                                if (program.grep) {
-                                    var re = new RegExp(program.grep);
+                                if (program.grep || program.grepi) {
+                                    var re;
+                                    if (program.grepi) {
+                                        re = new RegExp(program.grepi, 'i');
+                                    } else {
+                                        re = new RegExp(program.grep);
+                                    }
                                     if (line.match(re)) {
                                         var highlightedLine = grepUtils.highlightString(line, re);
                                         var coloredLine = colors[host.color](hostName + ' ' + displayPath) + ' ' +
