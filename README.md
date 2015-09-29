@@ -27,6 +27,23 @@ Specify multiple files on the same host by repeating the hostname.
 remtail trillworks.com:/var/log/nginx/access.log trillworks.com:/var/log/nginx/error.log
 ```
 
+grep-like functionality with highlighting.
+
+Only print lines containing "Comment", with "Comment" shown in red.
+```
+  remtail --grep "Comment" trillworks.com:/var/log/apache2/other_vhosts_access.log
+```
+For case insensitive search, use --grepi.
+```
+remtail --grepi "Comment" trillworks.com:/var/log/apache2/other_vhosts_access.log
+```
+
+You have full support for JavaScript regular expressions, so you can search for multiple strings like this:
+```
+remtail --grepi "GET|POST" trillworks.com:/var/log/apache2/other_vhosts_access.log
+```
+
+
 # advanced usage
 
 To avoid typing in passwords for every host,
